@@ -525,7 +525,7 @@ public class MahJongPanel extends JPanel {
     public void addPanel(String player, BasicJPanel comp) {
         this.panelListMap.putIfAbsent(player, new Vector<>());
         this.panelListMap.get(player).add(comp);
-        super.add(comp);
+        this.add(comp.getMainPanel());
     }
 
     /**

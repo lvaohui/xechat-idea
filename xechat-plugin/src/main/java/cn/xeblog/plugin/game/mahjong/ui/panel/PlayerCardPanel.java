@@ -10,6 +10,7 @@ import cn.xeblog.plugin.game.mahjong.ui.component.CardLabel;
 import cn.xeblog.plugin.game.mahjong.ui.config.Config;
 import cn.xeblog.plugin.game.mahjong.ui.enums.Position;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -22,6 +23,10 @@ import java.util.List;
 public class PlayerCardPanel extends BasicJPanel {
 
     private PlayerNode playerNode;
+    /**
+     * 可滑动显示
+     */
+    private JScrollPane jScrollPane;
 
     public PlayerCardPanel(MahJongPanel mahJongPanel, PlayerNode playerNode) {
         super(mahJongPanel);
@@ -30,6 +35,11 @@ public class PlayerCardPanel extends BasicJPanel {
         f.setHgap(0);
         f.setVgap(0);
         f.setAlignment(FlowLayout.CENTER);
+
+        this.jScrollPane = new JScrollPane(this);
+        this.jScrollPane.setBorder(null);
+        this.jScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.jScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
     }
 
     /**
@@ -124,4 +134,14 @@ public class PlayerCardPanel extends BasicJPanel {
         });
     }
 
+    @Override
+    public void setBounds(double width, double height) {
+        this.jScrollPane.setBounds((int) (width * xRate), (int) (height * yRate),
+                (int) (width * widthRate), (int) (height * heightRate));
+    }
+
+    @Override
+    public JComponent getMainPanel() {
+        return this.jScrollPane;
+    }
 }

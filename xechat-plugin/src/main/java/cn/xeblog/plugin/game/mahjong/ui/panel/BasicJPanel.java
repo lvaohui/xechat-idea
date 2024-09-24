@@ -1,8 +1,9 @@
 package cn.xeblog.plugin.game.mahjong.ui.panel;
 
 import cn.xeblog.plugin.game.mahjong.ui.MahJongPanel;
-import cn.xeblog.plugin.game.mahjong.ui.config.Config;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,19 +24,19 @@ public abstract class BasicJPanel extends JPanel {
     /**
      * x坐标比例
      */
-    private int xRate;
+    protected int xRate;
     /**
      * y坐标比例
      */
-    private int yRate;
+    protected int yRate;
     /**
      * 宽度比例
      */
-    private int widthRate;
+    protected int widthRate;
     /**
      * 高度比例
      */
-    private int heightRate;
+    protected int heightRate;
 
     public BasicJPanel(MahJongPanel mahJongPanel) {
         this.mahJongPanel = mahJongPanel;
@@ -61,6 +62,13 @@ public abstract class BasicJPanel extends JPanel {
      */
     public void setBounds(double width, double height) {
         super.setBounds((int) (width * xRate), (int) (height * yRate), (int) (width * widthRate), (int) (height * heightRate));
+    }
+
+    /**
+     * 取该组件的主面板
+     */
+    public JComponent getMainPanel() {
+        return this;
     }
 
     /**
