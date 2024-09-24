@@ -13,7 +13,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 public class XEChatClient {
 
     private static final String HOST = "localhost";
-    private static final int PORT = 1024;
+    private static final int PORT = 9000;
 
     public static void run(ConnectionAction connectionAction, ClientConnectConsumer consumer) {
         String host = connectionAction.getHost();

@@ -313,7 +313,7 @@ public abstract class AbstractPanelComponent {
         ApplicationManager.getApplication().invokeLater(runnable);
     }
 
-    protected final void invoke(Runnable runnable, long millis) {
+    public final void invoke(Runnable runnable, long millis) {
         GlobalThreadPool.execute(() -> {
             spinMoment(millis);
             invoke(runnable);
