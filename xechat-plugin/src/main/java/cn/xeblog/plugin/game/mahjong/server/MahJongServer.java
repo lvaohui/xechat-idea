@@ -254,7 +254,7 @@ public class MahJongServer {
      */
     private void reset() {
         currentPlayerIndex = new AtomicInteger(zhuangIndex);
-        mahJongCardList = MahJongUtil.randomCardList();
+        mahJongCardList = MahJongUtil.randomCardList(4);
         mahJongIndex = new AtomicInteger(0);
         playerSwapCardList = Collections.synchronizedList(ListUtil.toList(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         swapCounter = new AtomicInteger(0);

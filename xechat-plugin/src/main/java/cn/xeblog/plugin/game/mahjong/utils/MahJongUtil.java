@@ -26,10 +26,12 @@ public class MahJongUtil {
      *
      * @return
      */
-    public static List<MahJongCard> randomCardList() {
+    public static List<MahJongCard> randomCardList(int n) {
         List<MahJongCard> mahJongCardList = new Vector<>(ALL_MAHJONG_CARDS);
 //        return mahJongCardList;
-        Collections.shuffle(mahJongCardList);
+        for (int i = 0; i < n; ++i) {
+            Collections.shuffle(mahJongCardList);
+        }
         return mahJongCardList;
     }
 
