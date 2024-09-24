@@ -1,6 +1,7 @@
 package cn.xeblog.plugin.game.mahjong.ui;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.xeblog.commons.entity.game.mahjong.MahJongGameDTO;
@@ -13,14 +14,16 @@ import cn.xeblog.plugin.game.mahjong.ui.component.CardLabel;
 import cn.xeblog.plugin.game.mahjong.ui.component.MyButton;
 import cn.xeblog.plugin.game.mahjong.ui.enums.Position;
 import cn.xeblog.plugin.game.mahjong.ui.panel.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -45,7 +48,7 @@ public class MahJongPanel extends JPanel {
     /**
      * 游戏组件列表
      */
-    private List<BasicJPanel> panelList;
+    private Map<String, List<BasicJPanel>> panelListMap;
     /**
      * 当前玩家节点
      */
@@ -68,7 +71,7 @@ public class MahJongPanel extends JPanel {
      */
     public MahJongPanel(MahJongGame mahJongGame) {
         this.game = mahJongGame;
-        this.panelList = new Vector<>();
+        this.panelListMap = new ConcurrentHashMap<>();
         this.currentPlayerNode = null;
         this.playerNodeMap = new ConcurrentHashMap<>();
         this.over = new AtomicBoolean(false);
@@ -81,9 +84,7 @@ public class MahJongPanel extends JPanel {
                 Dimension dimension = e.getComponent().getSize();
                 double width = dimension.getWidth() / 26f;
                 double height = dimension.getHeight() / 21f;
-                for (BasicJPanel panel : panelList) {
-                    panel.setBounds(width, height);
-                }
+                panelListMap.forEach((k, v) -> v.forEach(p -> p.setBounds(width, height)));
             }
         });
         init();
@@ -98,8 +99,8 @@ public class MahJongPanel extends JPanel {
         centerPanel.setFixedPosition(7, 7, 12, 4);
         controlPanel.setFixedPosition(3, 15, 20, 3);
 
-        this.addPanel(controlPanel);
-        this.addPanel(centerPanel);
+        this.addPanel("control-panel", controlPanel);
+        this.addPanel("center-panel", centerPanel);
     }
 
     /**
@@ -146,9 +147,9 @@ public class MahJongPanel extends JPanel {
                 break;
             default:
         }
-        this.addPanel(playerPanel);
-        this.addPanel(outCardPanel);
-        this.addPanel(infoPanel);
+        this.addPanel(playerNode.getName(), playerPanel);
+        this.addPanel(playerNode.getName(), outCardPanel);
+        this.addPanel(playerNode.getName(), infoPanel);
     }
 
 
@@ -185,11 +186,13 @@ public class MahJongPanel extends JPanel {
                     this.controlPanel.showSwapBtn();
                 }
                 this.centerPanel.updateCardNum(-cardList.size());
-                break;
+                this.updateShowUi(player);
+                return;
             }
             case SWAP_OUT: {
                 playerNode.swapOutThreeCard((List<MahJongCard>) mahJongGameDTO.getData());
-                break;
+                this.updateShowUi(player);
+                return;
             }
             case SWAP_IN: {
                 playerNode.swapInThreeCard((List<MahJongCard>) mahJongGameDTO.getData());
@@ -200,9 +203,11 @@ public class MahJongPanel extends JPanel {
             }
             case CONFIRM_DONT_NEED_CARD: {
                 playerNode.setNotNeedType((CardType) mahJongGameDTO.getData());
-                break;
+                this.updateShowUi(player);
+                return;
             }
             case START: {
+                this.currentPlayerNode.getChoiceCardLabelList().clear();
                 /* 如果当前玩家是庄则判断 */
                 if (ObjectUtil.equal(currentPlayerNode.getRole(), Role.ZHUANG)) {
                     this.currentPlayerNode.judgeGang();
@@ -222,7 +227,7 @@ public class MahJongPanel extends JPanel {
                     this.currentPlayerNode.judgeTing();
                     this.currentPlayerNode.judgeHu();
                     /* 听牌状态 且不能胡 且不能杠，直接出刚抓的 */
-                    if(this.currentPlayerNode.isTing() && !this.currentPlayerNode.getHuBO().getEnable()
+                    if (this.currentPlayerNode.isTing() && !this.currentPlayerNode.getHuBO().getEnable()
                             && !this.currentPlayerNode.getGangBO().getEnable()) {
                         MahJongCard lastCard = this.currentPlayerNode.getLastCard();
                         this.currentPlayerNode.outCard(lastCard);
@@ -296,8 +301,8 @@ public class MahJongPanel extends JPanel {
         }
         /* 如果已经选了，取消之前选的 */
         if (this.currentPlayerNode.getChoiceCardLabelList().size() > 0) {
-            this.currentPlayerNode.getChoiceCardLabelList().get(0).click();
-            this.currentPlayerNode.getChoiceCardLabelList().remove(0);
+            this.currentPlayerNode.getChoiceCardLabelList().forEach(CardLabel::click);
+            this.currentPlayerNode.getChoiceCardLabelList().clear();
         }
         label.click();
         this.currentPlayerNode.getChoiceCardLabelList().add(label);
@@ -517,8 +522,9 @@ public class MahJongPanel extends JPanel {
         this.game.sendMsg(MahJongGameDTO.MsgType.READY, null);
     }
 
-    public void addPanel(BasicJPanel comp) {
-        this.panelList.add(comp);
+    public void addPanel(String player, BasicJPanel comp) {
+        this.panelListMap.putIfAbsent(player, new Vector<>());
+        this.panelListMap.get(player).add(comp);
         super.add(comp);
     }
 
@@ -526,12 +532,18 @@ public class MahJongPanel extends JPanel {
      * 更新状态
      */
     public synchronized void updateShowUi() {
-        for (BasicJPanel panel : this.panelList) {
-            panel.updateShowUi();
-        }
-        this.centerPanel.updateShowUi();
-        this.controlPanel.updateShowUi();
+        this.panelListMap.forEach((k, v) -> v.forEach(BasicJPanel::updateShowUi));
         this.updateUI();
+    }
+
+    /**
+     * 更新相应玩家对应界面
+     *
+     * @param player
+     */
+    public synchronized void updateShowUi(String player) {
+        Optional.ofNullable(this.panelListMap.get(player)).orElse(ListUtil.empty())
+                .forEach(BasicJPanel::updateShowUi);
     }
 
     public void showTips(String text) {

@@ -79,8 +79,7 @@ public class MahJongGame extends AbstractGame<MahJongGameDTO> {
     @AllArgsConstructor
     @Getter
     private enum GameMode {
-        XUE_ZHAN("血战到底"),
-        XUE_LIU("血流成河");
+        XUE_ZHAN("血战到底");
 
         private String name;
 
@@ -299,14 +298,15 @@ public class MahJongGame extends AbstractGame<MahJongGameDTO> {
         }
         mainPanel.removeAll();
         mainPanel.setLayout(new BorderLayout());
-        mainPanel.setMinimumSize(new Dimension(560, 430));
+        mainPanel.setMinimumSize(new Dimension(400, 300));
+        mainPanel.setPreferredSize(new Dimension(560, 400));
 
         mahJongPanel = new MahJongPanel(this);
         int n = this.playerNodeList.size();
         for (int i = 0; i < n; ++i) {
             mahJongPanel.addPlayer(this.playerNodeList.get((this.playerIndex + i) % n), POSITION_LIST.get(i));
         }
-        mahJongPanel.setPreferredSize(new Dimension(560, 400));
+        mahJongPanel.setPreferredSize(new Dimension(560, 360));
 
         JPanel mainBottomPanel = new JPanel();
         if (getRoom() == null) {

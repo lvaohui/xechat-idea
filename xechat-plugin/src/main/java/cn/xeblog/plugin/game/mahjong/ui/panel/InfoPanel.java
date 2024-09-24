@@ -1,6 +1,7 @@
 package cn.xeblog.plugin.game.mahjong.ui.panel;
 
 import cn.hutool.core.util.StrUtil;
+import cn.xeblog.commons.entity.game.mahjong.enums.CardType;
 import cn.xeblog.plugin.game.mahjong.domain.PlayerNode;
 import cn.xeblog.plugin.game.mahjong.ui.MahJongPanel;
 import cn.xeblog.plugin.game.mahjong.ui.config.Config;
@@ -8,6 +9,7 @@ import cn.xeblog.plugin.game.mahjong.ui.enums.Position;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Optional;
 
 /**
  * 玩家信息显示区域
@@ -73,26 +75,28 @@ public class InfoPanel extends BasicJPanel {
         String arrow = "";
         String label1Txt = "";
         String label2Txt = "";
+        String notNeed = Optional.ofNullable(this.playerNode.getNotNeedType())
+                .map(CardType::getName).orElse("");
         switch (this.position) {
             case BOTTOM:{
                 label1Txt = StrUtil.format("←{}·{}", this.playerNode.getName(), this.playerNode.getRole().getName());
-                label2Txt = StrUtil.format("{} {}", this.playerNode.getNotNeedType().getName(), this.playerNode.getScore().get());
+                label2Txt = StrUtil.format("{} {}", notNeed, this.playerNode.getScore().get());
                 break;
             }
             case RIGHT: {
                 label2Txt = StrUtil.format("↓{}·{}", this.playerNode.getName(), this.playerNode.getRole().getName());
-                label1Txt = StrUtil.format("{} {}", this.playerNode.getNotNeedType().getName(), this.playerNode.getScore().get());
+                label1Txt = StrUtil.format("{} {}", notNeed, this.playerNode.getScore().get());
                 break;
             }
             case UP:{
                 arrow = "→";
                 label1Txt = StrUtil.format("{}·{}→", this.playerNode.getName(), this.playerNode.getRole().getName());
-                label2Txt = StrUtil.format("{} {}", this.playerNode.getNotNeedType().getName(), this.playerNode.getScore().get());
+                label2Txt = StrUtil.format("{} {}", notNeed, this.playerNode.getScore().get());
                 break;
             }
             case LEFT: {
                 label1Txt = StrUtil.format("↑{}·{}", this.playerNode.getName(), this.playerNode.getRole().getName());
-                label2Txt = StrUtil.format("{} {}", this.playerNode.getNotNeedType().getName(), this.playerNode.getScore().get());
+                label2Txt = StrUtil.format("{} {}", notNeed, this.playerNode.getScore().get());
                 break;
             }
             default:

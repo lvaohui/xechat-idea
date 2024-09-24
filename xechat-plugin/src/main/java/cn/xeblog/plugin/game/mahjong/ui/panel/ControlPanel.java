@@ -139,7 +139,7 @@ public class ControlPanel extends BasicJPanel {
      */
     public void showSwapBtn() {
         this.swapBtn.setVisible(true);
-//        this.updateUI();
+        this.updateShowUi();
     }
 
     /**
